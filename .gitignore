@@ -1,0 +1,10 @@
+# Mac/Windows system files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/
+
+# Chrome Extension specific
+*.pem
+_metadata/
