@@ -1,5 +1,5 @@
 /**
- * LLM Scroll Navigator - Root Injection Fix
+ * LLM Scroll Navigator - With Top/Bottom Navigation
  */
 
 // --- Configuration ---
@@ -46,7 +46,7 @@ function getScrollParent(node) {
   return window;
 }
 
-// --- Navigation ---
+// --- Navigation Logic ---
 function navigate(type, direction) {
   const config = getCurrentConfig();
   if (!config) return;
@@ -76,6 +76,30 @@ function navigate(type, direction) {
   if (target) {
     smoothScrollToElement(target);
     flashHighlight(target);
+  }
+}
+
+/**
+ * Scrolls to the very top or bottom of the active container
+ */
+function scrollToExtreme(destination) {
+  const config = getCurrentConfig();
+  if (!config) return;
+
+  // Find a reference element to locate the correct scroll container
+  // We use the prompt selector as a reliable anchor
+  const anchor = document.querySelector(config.prompt);
+  const container = getScrollParent(anchor); // Falls back to window if null
+
+  if (destination === "top") {
+    container.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    // Scroll to the absolute bottom
+    const scrollHeight =
+      container === window
+        ? document.body.scrollHeight
+        : container.scrollHeight;
+    container.scrollTo({ top: scrollHeight, behavior: "smooth" });
   }
 }
 
@@ -116,7 +140,6 @@ function makeDraggable(element) {
     pos3 = e.clientX;
     pos4 = e.clientY;
 
-    // Switch to absolute positioning relative to window
     const rect = element.getBoundingClientRect();
     element.style.bottom = "auto";
     element.style.right = "auto";
@@ -145,7 +168,7 @@ function makeDraggable(element) {
   }
 }
 
-// --- UI Construction (The Critical Fix) ---
+// --- UI Construction ---
 function createUI() {
   if (document.getElementById("llm-nav-container")) return;
 
@@ -154,26 +177,40 @@ function createUI() {
   container.style.display = "none";
   container.innerHTML = `
     <div class="llm-nav-group">
-      <span class="llm-nav-label">Prompts (Alt+A/D)</span>
+      <span class="llm-nav-label">Page</span>
       <div class="llm-nav-buttons">
-        <button id="ln-prev-prompt">▲</button>
-        <button id="ln-next-prompt">▼</button>
+        <button id="ln-scroll-top" title="Scroll to Top">⤒</button>
+        <button id="ln-scroll-bot" title="Scroll to Bottom">⤓</button>
       </div>
     </div>
+
+    <div class="llm-nav-divider"></div>
+
     <div class="llm-nav-group">
-      <span class="llm-nav-label">Code (Alt+W/S)</span>
+      <span class="llm-nav-label">Prompts</span>
       <div class="llm-nav-buttons">
-        <button id="ln-prev-code">▲</button>
-        <button id="ln-next-code">▼</button>
+        <button id="ln-prev-prompt" title="Previous Prompt (Alt+A)">▲</button>
+        <button id="ln-next-prompt" title="Next Prompt (Alt+D)">▼</button>
+      </div>
+    </div>
+
+    <div class="llm-nav-group">
+      <span class="llm-nav-label">Code</span>
+      <div class="llm-nav-buttons">
+        <button id="ln-prev-code" title="Previous Code (Alt+W)">▲</button>
+        <button id="ln-next-code" title="Next Code (Alt+S)">▼</button>
       </div>
     </div>
   `;
 
-  // INJECTION FIX: Attach to documentElement (HTML tag) instead of body
-  // This bypasses Gemini's body layout logic completely.
   document.documentElement.appendChild(container);
-
   makeDraggable(container);
+
+  // Event Listeners
+  document.getElementById("ln-scroll-top").onclick = () =>
+    scrollToExtreme("top");
+  document.getElementById("ln-scroll-bot").onclick = () =>
+    scrollToExtreme("bottom");
 
   document.getElementById("ln-prev-prompt").onclick = () =>
     navigate("prompt", "prev");
@@ -204,7 +241,6 @@ function maintenanceLoop() {
 }
 
 // --- Init ---
-// Wait for window load to ensure we don't interrupt initial page render
 window.addEventListener("load", () => {
   setInterval(maintenanceLoop, 1000);
   maintenanceLoop();
