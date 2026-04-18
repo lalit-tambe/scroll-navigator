@@ -125,3 +125,74 @@
   text-transform: uppercase;
   color: #aaa;
 }
+
+/* Minimap for Prompts */
+#llm-nav-minimap {
+  position: fixed;
+  top: 0;
+  right: 20px; /* Shifted left to avoid overlapping the native scrollbar */
+  width: 6px;
+  height: 100vh;
+  z-index: 2147483646;
+  pointer-events: none;
+  background: rgba(128, 128, 128, 0.15);
+  border-radius: 4px;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.llm-nav-minimap-marker {
+  position: absolute;
+  width: 100%;
+  height: 11px; /* Larger invisible hit area */
+  margin-top: -3px; /* Shift up to center */
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.llm-nav-minimap-marker::before {
+  content: "";
+  position: absolute;
+  top: 3px; 
+  left: 0; right: 0;
+  height: 5px; /* Actual visual height */
+  background: #6c757d;
+  border-radius: 2px;
+  box-shadow: 0 0 3px rgba(0,0,0,0.6);
+  opacity: 0.9;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.llm-nav-minimap-marker:hover {
+  z-index: 2;
+}
+
+.llm-nav-minimap-marker:hover::before {
+  transform: scale(1.5);
+  background: #facc15;
+}
+
+.llm-nav-minimap-tooltip {
+  display: none;
+  position: absolute;
+  right: 15px; /* Appears to the left of the marker */
+  top: 50%;
+  transform: translateY(-50%);
+  background: #2a2a2a;
+  color: #eee;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  font-family: sans-serif;
+  font-size: 11px;
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.llm-nav-minimap-marker:hover .llm-nav-minimap-tooltip {
+  display: block;
+}
