@@ -47,9 +47,9 @@ function getScrollParent(node) {
 }
 
 // --- Navigation Logic ---
-function navigate(type, direction) {
+function getTarget(type, direction) {
   const config = getCurrentConfig();
-  if (!config) return;
+  if (!config) return null;
 
   const elements = Array.from(document.querySelectorAll(config[type]));
   const visibleElements = elements.filter((el) => {
@@ -57,21 +57,24 @@ function navigate(type, direction) {
     return rect.height > 0 && el.offsetParent !== null;
   });
 
-  if (visibleElements.length === 0) return;
+  if (visibleElements.length === 0) return null;
 
-  let target = null;
   if (direction === "next") {
-    target = visibleElements.find(
+    return visibleElements.find(
       (el) => el.getBoundingClientRect().top > HEADER_OFFSET + SCROLL_TOLERANCE,
     );
   } else {
-    target = [...visibleElements]
+    return [...visibleElements]
       .reverse()
       .find(
         (el) =>
           el.getBoundingClientRect().top < HEADER_OFFSET - SCROLL_TOLERANCE,
       );
   }
+}
+
+function navigate(type, direction) {
+  const target = getTarget(type, direction);
 
   if (target) {
     smoothScrollToElement(target);
@@ -176,6 +179,7 @@ function createUI() {
   container.id = "llm-nav-container";
   container.style.display = "none";
   container.innerHTML = `
+    <div id="llm-nav-tooltip"></div>
     <div class="llm-nav-group">
       <span class="llm-nav-label">Page</span>
       <div class="llm-nav-buttons">
@@ -220,6 +224,46 @@ function createUI() {
     navigate("code", "prev");
   document.getElementById("ln-next-code").onclick = () =>
     navigate("code", "next");
+
+  // Tooltip Logic
+  const tooltip = document.getElementById("llm-nav-tooltip");
+
+  function showTooltip(type, direction) {
+    const target = getTarget(type, direction);
+    if (!target) {
+      tooltip.classList.remove("visible");
+      return;
+    }
+
+    let previewText = "";
+    let badgeText = type.toUpperCase();
+
+    const text = target.innerText.trim();
+    if (type === "prompt") {
+      previewText = text.slice(0, 60).replace(/\n/g, " ");
+      if (text.length > 60) previewText += "...";
+    } else {
+      const firstLine = text.split("\n")[0].trim().slice(0, 50);
+      previewText = firstLine.length > 0 ? firstLine : "{ ... }";
+    }
+
+    tooltip.innerHTML = `<span class="llm-nav-tooltip-badge">${badgeText}</span><span>${previewText}</span>`;
+    tooltip.classList.add("visible");
+  }
+
+  function hideTooltip() {
+    tooltip.classList.remove("visible");
+  }
+
+  document.getElementById("ln-prev-prompt").onmouseenter = () => showTooltip("prompt", "prev");
+  document.getElementById("ln-prev-prompt").onmouseleave = hideTooltip;
+  document.getElementById("ln-next-prompt").onmouseenter = () => showTooltip("prompt", "next");
+  document.getElementById("ln-next-prompt").onmouseleave = hideTooltip;
+  
+  document.getElementById("ln-prev-code").onmouseenter = () => showTooltip("code", "prev");
+  document.getElementById("ln-prev-code").onmouseleave = hideTooltip;
+  document.getElementById("ln-next-code").onmouseenter = () => showTooltip("code", "next");
+  document.getElementById("ln-next-code").onmouseleave = hideTooltip;
 }
 
 function maintenanceLoop() {

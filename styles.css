@@ -86,3 +86,42 @@
   background: #777;
   transform: translateY(1px);
 }
+
+/* Tooltip for hover previews */
+#llm-nav-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2a2a2a;
+  color: #eee;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  font-size: 11px;
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#llm-nav-tooltip.visible {
+  opacity: 1;
+}
+
+.llm-nav-tooltip-badge {
+  background: #444;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #aaa;
+}
