@@ -5,8 +5,13 @@
   "description": "Keyboard and UI navigation for Prompts and Code Blocks on ChatGPT, Claude, and Gemini.",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "storage"
   ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Settings"
+  },
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

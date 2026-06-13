@@ -47,7 +47,7 @@ function createUI() {
   container.style.display = "none";
   container.innerHTML = `
     <div id="llm-nav-tooltip"></div>
-    <div class="llm-nav-group">
+    <div class="llm-nav-group" id="ln-page-group">
       <span class="llm-nav-label">Page</span>
       <div class="llm-nav-buttons">
         <button id="ln-scroll-top" title="Scroll to Top">⤒</button>
@@ -55,7 +55,7 @@ function createUI() {
       </div>
     </div>
 
-    <div class="llm-nav-divider"></div>
+    <div class="llm-nav-divider" id="ln-page-divider"></div>
 
     <div class="llm-nav-group">
       <span class="llm-nav-label">Prompts</span>
@@ -65,7 +65,7 @@ function createUI() {
       </div>
     </div>
 
-    <div class="llm-nav-group">
+    <div class="llm-nav-group" id="ln-code-group">
       <span class="llm-nav-label">Code</span>
       <div class="llm-nav-buttons">
         <button id="ln-prev-code" title="Previous Code (Alt+W)">▲</button>
