@@ -21,7 +21,12 @@
         "*://aistudio.google.com/*"
       ],
       "js": [
-        "content.js"
+        "scripts/config.js",
+        "scripts/utils.js",
+        "scripts/navigation.js",
+        "scripts/ui.js",
+        "scripts/minimap.js",
+        "scripts/main.js"
       ],
       "css": [
         "styles.css"
