@@ -11,6 +11,7 @@ No more endless scrolling to find that one specific prompt or code block!
 - **Interactive Minimap**: A visual scrollbar minimap that displays markers for all your prompts in the conversation. Hover over a marker to see a preview of the prompt, and click to scroll directly to it.
 - **Scroll to Extremes**: Instantly scroll to the very top or bottom of the conversation.
 - **Smart Highlighting**: Temporarily highlights the target element when you navigate to it so you don't lose your place.
+- **Settings Menu**: A clean popup interface to individually toggle the "Page Navigation" and "Code Navigation" features.
 - **Zero Build Step**: Pure JavaScript and CSS. No bundlers or compile steps required.
 
 ## Supported Sites
@@ -53,14 +54,23 @@ A small, draggable control panel will appear on supported pages when a conversat
 Hovering over the "Prev" or "Next" buttons will display a tooltip previewing the text of the prompt or code block you are about to jump to.
 
 ### Architecture Notes
-- `manifest.json`: Defines the Manifest V3 settings, URL match patterns, and injected scripts.
-- `content.js`: Contains all the navigation logic, DOM querying, UI construction, and minimap rendering.
-- `styles.css`: Styles for the injected floating UI and minimap.
-- All site-specific selectors (like how to find a prompt or code block on Claude vs ChatGPT) are stored in the `SITE_CONFIG` object at the top of `content.js`. If a site updates its UI and navigation breaks, update the CSS selectors there.
+- `manifest.json`: Defines the Manifest V3 settings, URL match patterns, and script loading order.
+- `scripts/`: Modular JavaScript files split logically without needing a bundler.
+  - `config.js`: Contains configuration and `SITE_CONFIG` DOM selectors.
+  - `utils.js`: Reusable generic DOM helpers.
+  - `navigation.js`: Logic for scroll targets and smooth scrolling.
+  - `ui.js`: Draggable widget and tooltip generation.
+  - `minimap.js`: Logic for the visual scrollbar rendering.
+  - `main.js`: Setup, initialization loops, settings retrieval, and event listeners.
+- `popup/`: HTML, CSS, and JS files for the extension settings menu.
+- `styles.css`: Core styles for the injected floating UI and minimap on the host page.
+- `icons/`: Extension icons generated at required sizes (16x16, 48x48, 128x128).
+
+**Note:** If an LLM website updates its UI and navigation breaks, fix the relevant CSS selectors inside `scripts/config.js`.
 
 ## Development
 To test changes during development:
-1. Edit the relevant files (`content.js`, `styles.css`, etc.).
+1. Edit the relevant files (e.g., `scripts/*.js`, `styles.css`, `popup/popup.js`).
 2. Go back to your browser's extensions page (`chrome://extensions/`).
 3. Click the "Reload" icon (🔄) on the LLM Scroll Navigator card.
 4. Refresh the page where you are testing the extension.
